@@ -1,0 +1,11 @@
+.vscode/*
+.vs/*
+Binaries/*
+Intermediate/*
+Saved/*
+Build/*
+DerivedDataCache/*
+
+
+
+Content/Beta/*
