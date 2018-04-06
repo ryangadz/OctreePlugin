@@ -1,9 +1,11 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
+#include "Runtime/Engine/Classes/Components/InstancedStaticMeshComponent.h"
+#include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "OctreePluginBPLibrary.generated.h"
+
 
 /* 
 *	Function library class.
@@ -29,4 +31,34 @@ class UOctreePluginBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Execute Sample function", Keywords = "OctreePlugin sample test testing"), Category = "OctreePluginTesting")
 	static float OctreePluginSampleFunction(float Param);
+
+
+
+	// UFUNCTION(BlueprintCallable, meta = (DisplayName = "Build Octree", 
+	// Keywords = "OctreePlugin sample test testing"), 
+	// Category = "OctreePluginTesting")
+	static void Octree(
+		class AActor *Actor,
+		class UInstancedStaticMeshComponent *InstancedMesh, 
+		const FVector &Location,
+		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
+		const float &Size,
+		int32& finalIndex,
+		const int32 MaxIterations = 6,
+		const int32 CurrentIterations = 0);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Build Octree", 
+	Keywords = "OctreePlugin sample test testing"), 
+	Category = "OctreePluginTesting")
+	static void VoxelAdd(
+		class AActor *Actor,
+		class UInstancedStaticMeshComponent *InstancedMesh, 
+		const FVector &Location,
+		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
+		const float &Size,
+		const int32 MaxIterations = 6,
+		const int32 CurrentIterations = 0);
+	
+
+
 };
