@@ -31,18 +31,19 @@ TArray<UPrimitiveComponent *> OutComponents;
 int32 index = 0;
 
 void UOctreePluginBPLibrary::Octree(
-	class AActor *Actor,
+	class UObject* WorldContextObject,
 	class UInstancedStaticMeshComponent *InstancedMesh,
 	const FVector &Location,
 	const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
 	const float &Size,
-	int32& finalIndex,
+	int32 &finalIndex,
 	const int32 MaxIterations,
 	const int32 CurrentIterations)
 {
 	FVector BoxPos;
 	FVector BoxExtent;
-
+	if (!InstancedMesh)
+		return;
 	float currentSize = Size / 2;
 	for (int32 i = 0; i <= 7; i++)
 	{
@@ -52,19 +53,21 @@ void UOctreePluginBPLibrary::Octree(
 			FQuat(0.f, 0.f, 0.f, 1.f),
 			BoxPos,
 			FVector(currentSize / 8));
-		if (UKismetSystemLibrary::BoxOverlapComponents(Actor, BoxPos, BoxExtent, ObjectTypes,
+		if (UKismetSystemLibrary::BoxOverlapComponents(WorldContextObject, BoxPos, BoxExtent, ObjectTypes,
 													   ClassFilter, ActorsToIgnore, OutComponents))
 		{
 			if (MaxIterations > (CurrentIterations + 1))
-				Octree(Actor, InstancedMesh, BoxPos, ObjectTypes,
+				Octree(WorldContextObject, InstancedMesh, BoxPos, ObjectTypes,
 					   currentSize, finalIndex, MaxIterations, CurrentIterations + 1);
 			else
 			{
-				InstancedMesh->UpdateInstanceTransform(finalIndex, locTrans, true, false, true);
+
 				if (!InstancedMesh->UpdateInstanceTransform(finalIndex, locTrans, true, false, true))
 				{
 					InstancedMesh->AddInstanceWorldSpace(locTrans);
 				}
+				else
+					InstancedMesh->UpdateInstanceTransform(finalIndex, locTrans, true, false, true);
 				finalIndex++;
 			}
 		}
@@ -72,7 +75,7 @@ void UOctreePluginBPLibrary::Octree(
 }
 
 void UOctreePluginBPLibrary::VoxelAdd(
-	class AActor *Actor,
+	class UObject* WorldContextObject,
 	class UInstancedStaticMeshComponent *InstancedMesh,
 	const FVector &Location,
 	const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
@@ -80,19 +83,23 @@ void UOctreePluginBPLibrary::VoxelAdd(
 	const int32 MaxIterations,
 	const int32 CurrentIterations)
 {
+	if (!InstancedMesh)
+		return;
 	int32 finalIndex = 0;
-			FTransform OutInstanceTransform(
-			FQuat(0.f, 0.f, 0.f, 1.f),
-			FVector(0.f),
-			FVector(0.f));
-	Octree(Actor, InstancedMesh, Location, ObjectTypes, Size, finalIndex, MaxIterations, CurrentIterations);
-	InstancedMesh->GetInstanceTransform(0, OutInstanceTransform, true);
-	InstancedMesh->UpdateInstanceTransform(0,OutInstanceTransform, true, true, true);
-	int32 instanceCount = InstancedMesh->GetInstanceCount()-1;
-	if (instanceCount>(finalIndex))
+	FTransform OutInstanceTransform(
+		FQuat(0.f, 0.f, 0.f, 1.f),
+		FVector(0.f),
+		FVector(0.f));
+	Octree(WorldContextObject, InstancedMesh, Location, ObjectTypes, Size, finalIndex, MaxIterations, CurrentIterations);
+	if (InstancedMesh->GetInstanceTransform(0, OutInstanceTransform, true))
 	{
-		 for (int32 i = finalIndex; i <= instanceCount; i++)
-		 	InstancedMesh->RemoveInstance(i);
+		InstancedMesh->GetInstanceTransform(0, OutInstanceTransform, true);
+		InstancedMesh->UpdateInstanceTransform(0, OutInstanceTransform, true, true, true);
+		int32 instanceCount = InstancedMesh->GetInstanceCount();
+		if (instanceCount > (finalIndex))
+		{
+			for (int32 i = finalIndex; i <= instanceCount; i++)
+				InstancedMesh->RemoveInstance(i);
+		}
 	}
-
 }

@@ -38,7 +38,7 @@ class UOctreePluginBPLibrary : public UBlueprintFunctionLibrary
 	// Keywords = "OctreePlugin sample test testing"), 
 	// Category = "OctreePluginTesting")
 	static void Octree(
-		class AActor *Actor,
+		class UObject* WorldContextObject,
 		class UInstancedStaticMeshComponent *InstancedMesh, 
 		const FVector &Location,
 		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
@@ -47,11 +47,11 @@ class UOctreePluginBPLibrary : public UBlueprintFunctionLibrary
 		const int32 MaxIterations = 6,
 		const int32 CurrentIterations = 0);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Build Octree", 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "VoxelAdd", 
 	Keywords = "OctreePlugin sample test testing"), 
 	Category = "OctreePluginTesting")
 	static void VoxelAdd(
-		class AActor *Actor,
+		class UObject* WorldContextObject,
 		class UInstancedStaticMeshComponent *InstancedMesh, 
 		const FVector &Location,
 		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
