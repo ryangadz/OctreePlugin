@@ -14,10 +14,10 @@ AActorVoxel::AActorVoxel(const FObjectInitializer &ObjectInitializer) : Super(Ob
 		static ConstructorHelpers::FObjectFinder<UStaticMesh> Outline(TEXT("/Game/CubeUV.CubeUV"));
 		VolumeOutline->SetStaticMesh(Outline.Object);
 		VolumeOutline->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		VolumeOutline->SetWorldScale3D(FVector(Size/8.f));
+		VolumeOutline->SetWorldScale3D(FVector((Size)/8.f)+.1);
 		static ConstructorHelpers::FObjectFinder<UMaterial> MaterialOutline(TEXT("Material'/OctreePlugin/M_GridRuler.M_GridRuler'"));
 		if (MaterialOutline.Succeeded()) BaseMat = MaterialOutline.Object;
-		VolumeOutline->bHiddenInGame = true;
+		//VolumeOutline->bHiddenInGame = true;
 
 		InstancedMesh = ObjectInitializer.CreateDefaultSubobject<UInstancedStaticMeshComponent>(this, TEXT("CubeInstaces"));
 
@@ -78,11 +78,16 @@ void AActorVoxel::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedE
 	}
 	if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, Size)))
 	{
-		VolumeOutline->SetWorldScale3D(FVector(Size / 8.f));
+		VolumeOutline->SetWorldScale3D(FVector((Size) / 8.f)+.1);
 	}
 	if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, IterationsMax)))
 	{
-		MaterialOutlineInst->SetScalarParameterValue("Iterations", IterationsMax);
+		if(!MaterialOutlineInst){
+			MaterialOutlineInst = UMaterialInstanceDynamic::Create(BaseMat, this);
+			VolumeOutline->SetMaterial(0, MaterialOutlineInst);
+			MaterialOutlineInst->SetScalarParameterValue("Iterations", IterationsMax);
+		}
+		else MaterialOutlineInst->SetScalarParameterValue("Iterations", IterationsMax);
 	}
 
 	InstancedMesh->ClearInstances();

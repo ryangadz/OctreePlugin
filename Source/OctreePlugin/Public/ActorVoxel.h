@@ -18,8 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	AActorVoxel(const FObjectInitializer &ObjectInitializer);
 
+	UPROPERTY()
 	class UStaticMeshComponent *VolumeOutline;
+	UPROPERTY()
 	class UMaterialInstanceDynamic * MaterialOutlineInst;
+	UPROPERTY()
 	class UMaterial* BaseMat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh", Category = "Setup Properties")
