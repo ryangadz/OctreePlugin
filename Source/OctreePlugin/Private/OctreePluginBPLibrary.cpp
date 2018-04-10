@@ -61,8 +61,8 @@ void UOctreePluginBPLibrary::Octree(
 					   currentSize, finalIndex, MaxIterations, CurrentIterations + 1);
 			else
 			{
-
-				if (!InstancedMesh->UpdateInstanceTransform(finalIndex, locTrans, true, false, true))
+				if(InstancedMesh->GetInstanceCount() < finalIndex)
+				//if (!InstancedMesh->UpdateInstanceTransform(finalIndex, locTrans, true, false, true))
 				{
 					InstancedMesh->AddInstanceWorldSpace(locTrans);
 				}
@@ -75,7 +75,7 @@ void UOctreePluginBPLibrary::Octree(
 }
 
 void UOctreePluginBPLibrary::VoxelAdd(
-	class UObject* WorldContextObject,
+	class UObject *WorldContextObject,
 	class UInstancedStaticMeshComponent *InstancedMesh,
 	const FVector &Location,
 	const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
@@ -90,16 +90,19 @@ void UOctreePluginBPLibrary::VoxelAdd(
 		FQuat(0.f, 0.f, 0.f, 1.f),
 		FVector(0.f),
 		FVector(0.f));
+	//	InstancedMesh->ClearInstances();
 	Octree(WorldContextObject, InstancedMesh, Location, ObjectTypes, Size, finalIndex, MaxIterations, CurrentIterations);
+
+	int32 instanceCount = InstancedMesh->GetInstanceCount();
+	if (instanceCount > (finalIndex))
+	{
+		for (int32 i = finalIndex; i <= instanceCount; ++i)
+			InstancedMesh->RemoveInstance(i);
+	}
 	if (InstancedMesh->GetInstanceTransform(0, OutInstanceTransform, true))
 	{
 		InstancedMesh->GetInstanceTransform(0, OutInstanceTransform, true);
 		InstancedMesh->UpdateInstanceTransform(0, OutInstanceTransform, true, true, true);
-		int32 instanceCount = InstancedMesh->GetInstanceCount();
-		if (instanceCount > (finalIndex))
-		{
-			for (int32 i = finalIndex; i <= instanceCount; i++)
-				InstancedMesh->RemoveInstance(i);
-		}
 	}
+
 }

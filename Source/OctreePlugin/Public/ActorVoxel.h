@@ -18,13 +18,16 @@ public:
 	// Sets default values for this actor's properties
 	AActorVoxel(const FObjectInitializer &ObjectInitializer);
 
-
+	class UStaticMeshComponent *VolumeOutline;
+	class UMaterialInstanceDynamic * MaterialOutlineInst;
+	class UMaterial* BaseMat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh", Category = "Setup Properties")
 	class UStaticMesh *StaticMesh;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Material", Category = "Setup Properties")
-	class UMaterial *Material;
+	class UMaterialInterface *Material;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Object Types", Category = "Setup Properties")
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = {(EObjectTypeQuery::ObjectTypeQuery1)};
@@ -42,6 +45,8 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif 
+
+virtual void PostActorCreated();
 
 protected:
 	// Called when the game starts or when spawned

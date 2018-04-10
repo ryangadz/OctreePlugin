@@ -21,8 +21,9 @@ class OCTREEPLUGIN_API UVoxelAddComponent : public USceneComponent
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh", Category = "Setup Properties")
 	class UStaticMesh *StaticMesh;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Material", Category = "Setup Properties")
-	class UMaterialInterface *Material;
+	class UMaterial *Material;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Object Types", Category = "Setup Properties")
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = {(EObjectTypeQuery::ObjectTypeQuery1)};

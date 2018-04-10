@@ -8,29 +8,50 @@ AActorVoxel::AActorVoxel(const FObjectInitializer &ObjectInitializer) : Super(Ob
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 1/30.f;
 
-	if (!InstancedMesh)
+		VolumeOutline = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Outline"));
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> Outline(TEXT("/Game/CubeUV.CubeUV"));
+		VolumeOutline->SetStaticMesh(Outline.Object);
+		VolumeOutline->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		VolumeOutline->SetWorldScale3D(FVector(Size/8.f));
+		static ConstructorHelpers::FObjectFinder<UMaterial> MaterialOutline(TEXT("Material'/OctreePlugin/M_GridRuler.M_GridRuler'"));
+		if (MaterialOutline.Succeeded()) BaseMat = MaterialOutline.Object;
+		VolumeOutline->bHiddenInGame = true;
+
 		InstancedMesh = ObjectInitializer.CreateDefaultSubobject<UInstancedStaticMeshComponent>(this, TEXT("CubeInstaces"));
 
-	if (!StaticMesh)
-	{
+
 		StaticMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMesh>(this, TEXT("MyMesh"));
 		static ConstructorHelpers::FObjectFinder<UStaticMesh> MyMesh(TEXT("/Game/CubeUV.CubeUV"));
 		StaticMesh = MyMesh.Object;
 		InstancedMesh->SetStaticMesh(StaticMesh);
-	}
 
-	if (!Material)
-	{
+
+
 		Material = ObjectInitializer.CreateDefaultSubobject<UMaterial>(this, TEXT("MyMaterial"));
-		static ConstructorHelpers::FObjectFinder<UMaterial> MyMaterial(TEXT("/Game/M_Color1.M_Color1"));
+		static ConstructorHelpers::FObjectFinder<UMaterial> MyMaterial(TEXT("/Game/M_Cube.M_Cube"));
 		Material = MyMaterial.Object;
 		InstancedMesh->SetMaterial(0, Material);
-	}
 
 	InstancedMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	InstancedMesh->KeepInstanceBufferCPUAccess = true; 
+	InstancedMesh->UseDynamicInstanceBuffer = false;
 
+
+
+}
+
+void AActorVoxel::PostActorCreated()
+{
+	Super::PostActorCreated();
+
+	if (BaseMat)
+	{
+		MaterialOutlineInst = UMaterialInstanceDynamic::Create(BaseMat, this);
+		VolumeOutline->SetMaterial(0, MaterialOutlineInst);
+		MaterialOutlineInst->SetScalarParameterValue("Iterations", IterationsMax);
+	}
 	UOctreePluginBPLibrary::VoxelAdd(
 		this,
 		InstancedMesh,
@@ -45,27 +66,34 @@ AActorVoxel::AActorVoxel(const FObjectInitializer &ObjectInitializer) : Super(Ob
 void AActorVoxel::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-		FName MemberPropertyChanged = (PropertyChangedEvent.MemberProperty ? 
-	 							   PropertyChangedEvent.MemberProperty->GetFName() : NAME_None);
+	FName MemberPropertyChanged = (PropertyChangedEvent.MemberProperty ? PropertyChangedEvent.MemberProperty->GetFName() : NAME_None);
 
 	if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, Material)))
 	{
-		InstancedMesh->SetMaterial(0,Material);
+		InstancedMesh->SetMaterial(0, Material);
 	}
-	else if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, StaticMesh)))
+	if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, StaticMesh)))
 	{
 		InstancedMesh->SetStaticMesh(StaticMesh);
 	}
+	if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, Size)))
+	{
+		VolumeOutline->SetWorldScale3D(FVector(Size / 8.f));
+	}
+	if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(AActorVoxel, IterationsMax)))
+	{
+		MaterialOutlineInst->SetScalarParameterValue("Iterations", IterationsMax);
+	}
 
-
-		UOctreePluginBPLibrary::VoxelAdd(
-			this,
-			InstancedMesh,
-			this->GetActorLocation(),
-			ObjectTypes,
-			Size,
-			IterationsMax,
-			0);
+	InstancedMesh->ClearInstances();
+	UOctreePluginBPLibrary::VoxelAdd(
+		this,
+		InstancedMesh,
+		this->GetActorLocation(),
+		ObjectTypes,
+		Size,
+		IterationsMax,
+		0);
 }
 #endif
 
