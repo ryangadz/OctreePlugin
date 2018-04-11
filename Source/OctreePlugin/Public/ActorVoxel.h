@@ -1,12 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2018 Ryan Gadz, Inc. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
+#include "OctreeEnums.h"
 #include "OctreePluginBPLibrary.h"
 #include "ActorVoxel.generated.h"
+
+UENUM(BlueprintType)
+enum class EVoxelType : uint8
+{
+	E_Add UMETA(DisplayName = "Additive"),
+	E_Sub UMETA(DisplayName = "Subtractive")
+};
 
 UCLASS()
 class OCTREEPLUGIN_API AActorVoxel : public AActor
@@ -24,6 +32,9 @@ public:
 	class UMaterialInstanceDynamic * MaterialOutlineInst;
 	UPROPERTY()
 	class UMaterial* BaseMat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Voxel Type", Category = "Setup Properties")
+	EVoxelType1 VoxelType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh", Category = "Setup Properties")
 	class UStaticMesh *StaticMesh;
@@ -45,11 +56,13 @@ public:
 //	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Instanced Mesh", Category = "Setup Properties")
 	class UInstancedStaticMeshComponent *InstancedMesh;
 
+
+
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif 
 
-virtual void PostActorCreated();
+virtual void PostActorCreated() override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -59,6 +72,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+	virtual void BuildVoxels();
 	
 };

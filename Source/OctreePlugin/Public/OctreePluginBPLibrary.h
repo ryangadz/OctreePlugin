@@ -1,8 +1,9 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
+// Copyright 2018 Ryan Gadz, Inc. All Rights Reserved.
 
 #pragma once
 #include "Runtime/Engine/Classes/Components/InstancedStaticMeshComponent.h"
 #include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
+#include "OctreeEnums.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "OctreePluginBPLibrary.generated.h"
 
@@ -47,6 +48,16 @@ class UOctreePluginBPLibrary : public UBlueprintFunctionLibrary
 		const int32 MaxIterations = 6,
 		const int32 CurrentIterations = 0);
 
+	static void OctreeSub(
+		class UObject* WorldContextObject,
+		class UInstancedStaticMeshComponent *InstancedMesh, 
+		const FVector &Location,
+		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
+		const float &Size,
+		int32& finalIndex,
+		const int32 MaxIterations = 6,
+		const int32 CurrentIterations = 0);
+
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "VoxelAdd", 
 	Keywords = "OctreePlugin sample test testing"), 
 	Category = "OctreePluginTesting")
@@ -57,7 +68,8 @@ class UOctreePluginBPLibrary : public UBlueprintFunctionLibrary
 		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes,
 		const float &Size,
 		const int32 MaxIterations = 6,
-		const int32 CurrentIterations = 0);
+		const int32 CurrentIterations = 0,
+		const EVoxelType1 VoxelType = EVoxelType1::E_Add);
 	
 
 
