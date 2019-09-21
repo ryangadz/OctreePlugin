@@ -10,7 +10,7 @@ AActorVoxel::AActorVoxel(const FObjectInitializer &ObjectInitializer) : Super(Ob
 	PrimaryActorTick.TickInterval = 1 / 30.f;
 
 	VolumeOutline = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Outline"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> Outline(TEXT("/Game/CubeUV.CubeUV"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Outline(TEXT("/OctreePlugin/CubeUV.CubeUV"));
 	VolumeOutline->SetStaticMesh(Outline.Object);
 	VolumeOutline->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	VolumeOutline->SetWorldScale3D(FVector((Size) / 8.f) + .1);
@@ -22,18 +22,18 @@ AActorVoxel::AActorVoxel(const FObjectInitializer &ObjectInitializer) : Super(Ob
 	InstancedMesh = ObjectInitializer.CreateDefaultSubobject<UInstancedStaticMeshComponent>(this, TEXT("CubeInstaces"));
 
 	StaticMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMesh>(this, TEXT("MyMesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MyMesh(TEXT("/Game/CubeUV.CubeUV"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MyMesh(TEXT("/OctreePlugin/CubeUV.CubeUV"));
 	StaticMesh = MyMesh.Object;
 	InstancedMesh->SetStaticMesh(StaticMesh);
 
 	Material = ObjectInitializer.CreateDefaultSubobject<UMaterial>(this, TEXT("MyMaterial"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> MyMaterial(TEXT("/Game/M_Cube.M_Cube"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MyMaterial(TEXT("/OctreePlugin/M_Cube.M_Cube"));
 	Material = MyMaterial.Object;
 	InstancedMesh->SetMaterial(0, Material);
 
 	InstancedMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	InstancedMesh->KeepInstanceBufferCPUAccess = true;
-	InstancedMesh->UseDynamicInstanceBuffer = false;
+//	InstancedMesh->KeepInstanceBufferCPUAccess = true;
+//	InstancedMesh->UseDynamicInstanceBuffer = false;
 }
 
 void AActorVoxel::PostActorCreated()

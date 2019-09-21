@@ -10,7 +10,7 @@ public class OctreePlugin : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"OctreePlugin/Public"
+				"OctreePlugin/Public",
 				
 				// ... add public include paths required here ...
 			}

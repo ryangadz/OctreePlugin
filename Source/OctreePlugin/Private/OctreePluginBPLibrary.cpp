@@ -103,7 +103,7 @@ void UOctreePluginBPLibrary::VoxelAdd(
 			// removing the instance doesnt actually remove them until the next frame it seems
 			// so, adding a transform of size 0 actually is the fastest and cleanest approach
 			//	InstancedMesh->RemoveInstance(i)
-			InstancedMesh->UpdateInstanceTransform(i, OutInstanceTransform, true, true, true);
+			InstancedMesh->UpdateInstanceTransform(i, OutInstanceTransform, true, false, true);
 	}
 	if (InstancedMesh->GetInstanceTransform(0, OutInstanceTransform, true))
 	{
